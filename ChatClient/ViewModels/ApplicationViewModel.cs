@@ -35,6 +35,7 @@ namespace ChatClient.ViewModels
         {
             _hubConnection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:3001/chathub")
+                .WithUrl("http://localhost:3000/chathub")
                 .WithAutomaticReconnect()
                 .Build();
 
