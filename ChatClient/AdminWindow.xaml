@@ -1,0 +1,311 @@
+﻿<Window x:Class="ChatClient.AdminWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:ChatClient.ViewModels"
+        xmlns:converters="clr-namespace:ChatClient.Converters"
+        mc:Ignorable="d"
+        Title="Панель администратора - Ангстрем Чат" Height="700" Width="1000"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        WindowStartupLocation="CenterScreen">
+    <Window.DataContext>
+        <vm:AdminViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <!-- Same color scheme as MainWindow -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#1E3A8A"/>
+        <SolidColorBrush x:Key="SecondaryBrush" Color="#3B82F6"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#60A5FA"/>
+        <SolidColorBrush x:Key="DarkBrush" Color="#1F2937"/>
+        <SolidColorBrush x:Key="LightBrush" Color="#F3F4F6"/>
+        <SolidColorBrush x:Key="TextBrush" Color="#111827"/>
+        <SolidColorBrush x:Key="TextLightBrush" Color="#6B7280"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="#E5E7EB"/>
+        <SolidColorBrush x:Key="SuccessBrush" Color="#10B981"/>
+        <SolidColorBrush x:Key="WarningBrush" Color="#F59E0B"/>
+        <SolidColorBrush x:Key="ErrorBrush" Color="#EF4444"/>
+
+        <!-- Converters -->
+        <converters:BoolToStatusColorConverter x:Key="BoolToStatusColorConverter"/>
+        <converters:BoolToOnlineStatusConverter x:Key="BoolToOnlineStatusConverter"/>
+        <converters:BoolToStatusBrushConverter x:Key="BoolToStatusBrushConverter"/>
+
+        <!-- Card Style -->
+        <Style x:Key="StatCardStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="10"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="0" BlurRadius="10"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Button Styles -->
+        <Style x:Key="AdminButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="DangerButtonStyle" BasedOn="{StaticResource AdminButtonStyle}" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource ErrorBrush}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#D62828"/>
+                    <!-- Darker red on hover -->
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- DataGrid Styles (Basic) -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="GridLinesVisibility" Value="None"/>
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="RowDetailsVisibilityMode" Value="Collapsed"/>
+            <Setter Property="SelectionMode" Value="Single"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="VerticalGridLinesBrush" Value="{StaticResource BorderBrush}"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="{StaticResource LightBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1"/>
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Validation.ErrorTemplate" Value="{x:Null}"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource LightBrush}"/>
+                </Trigger>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+                    <Setter Property="Foreground" Value="White"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="White" CornerRadius="12" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" Opacity="0.1" ShadowDepth="0" BlurRadius="20"/>
+        </Border.Effect>
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Title Bar -->
+            <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" 
+                    CornerRadius="12,12,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" 
+                               VerticalAlignment="Center" Margin="20,0">
+                        <TextBlock Text="⚙️" FontSize="20" Margin="0,0,8,0" Foreground="White"/>
+                        <TextBlock Text="ПАНЕЛЬ АДМИНИСТРАТОРА" FontSize="16" FontWeight="Bold" 
+                                  Foreground="White" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="—" Width="40" Height="30" Background="Transparent" 
+                               Foreground="White" BorderThickness="0" Click="MinimizeButton_Click"/>
+                        <Button Content="✕" Width="40" Height="30" Background="Transparent" 
+                               Foreground="White" BorderThickness="0" Click="CloseButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Main Content -->
+            <Grid Grid.Row="1" Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Statistics Cards -->
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource StatCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Всего пользователей" FontSize="12" 
+                                      Foreground="{StaticResource TextLightBrush}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{Binding Statistics.TotalUsers}" FontSize="28" FontWeight="Bold" 
+                                      Foreground="{StaticResource PrimaryBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource StatCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Онлайн" FontSize="12" 
+                                      Foreground="{StaticResource TextLightBrush}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{Binding Statistics.OnlineUsers}" FontSize="28" FontWeight="Bold" 
+                                      Foreground="{StaticResource SuccessBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource StatCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Не в сети" FontSize="12" 
+                                      Foreground="{StaticResource TextLightBrush}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{Binding Statistics.OfflineUsers}" FontSize="28" FontWeight="Bold" 
+                                      Foreground="{StaticResource TextLightBrush}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Grid.Column="3" Style="{StaticResource StatCardStyle}">
+                        <StackPanel>
+                            <TextBlock Text="Активны за неделю" FontSize="12" 
+                                      Foreground="{StaticResource TextLightBrush}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{Binding Statistics.RecentUsers}" FontSize="28" FontWeight="Bold" 
+                                      Foreground="{StaticResource WarningBrush}"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Users Management -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Users List -->
+                    <Border Grid.Column="0" Background="White" CornerRadius="8" 
+                            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" 
+                            Margin="0,0,10,0">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Opacity="0.05" ShadowDepth="0" BlurRadius="10"/>
+                        </Border.Effect>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Margin="20,20,20,10">
+                                <TextBlock Text="Управление пользователями" FontSize="18" FontWeight="Bold" 
+                                           Foreground="{StaticResource TextBrush}" Margin="0,0,0,10"/>
+                                <Button Content="🔄 Обновить список" Style="{StaticResource AdminButtonStyle}" 
+                                        Command="{Binding LoadDataCommand}" HorizontalAlignment="Left"/>
+                            </StackPanel>
+
+                            <DataGrid x:Name="UsersDataGrid" Grid.Row="1" Margin="20,0" 
+                                      AutoGenerateColumns="False" CanUserAddRows="False" 
+                                      HeadersVisibility="Column" GridLinesVisibility="None"
+                                      ItemsSource="{Binding Users}"
+                                      SelectedItem="{Binding SelectedUser, Mode=TwoWay}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                                    <DataGridTextColumn Header="Имя пользователя" Binding="{Binding Username}" Width="*"/>
+                                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="*"/>
+                                    <DataGridTemplateColumn Header="Статус" Width="80">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border Background="{Binding IsOnline, Converter={StaticResource BoolToStatusBrushConverter}}" 
+                                                        CornerRadius="10" Padding="8,2">
+                                                    <TextBlock Text="{Binding IsOnline, Converter={StaticResource BoolToOnlineStatusConverter}}" 
+                                                               Foreground="White" FontSize="10" FontWeight="Bold" 
+                                                               HorizontalAlignment="Center"/>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="20" 
+                                       HorizontalAlignment="Right">
+                                <Button x:Name="DeleteUserButton" Content="🗑️ Удалить пользователя" 
+                                       Style="{StaticResource DangerButtonStyle}" 
+                                       Command="{Binding DeleteUserCommand}"
+                                       CommandParameter="{Binding ElementName=UsersDataGrid, Path=SelectedItem}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- User Details / Conversation View (Placeholder for now) -->
+                    <Border Grid.Column="1" Background="White" CornerRadius="8" 
+                            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" 
+                            Margin="10,0,0,0">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Black" Opacity="0.05" ShadowDepth="0" BlurRadius="10"/>
+                        </Border.Effect>
+                        <StackPanel Margin="20">
+                            <TextBlock Text="Детали пользователя / Переписка" FontSize="18" FontWeight="Bold" 
+                                       Foreground="{StaticResource TextBrush}" Margin="0,0,0,10"/>
+                            <TextBlock Text="Выберите пользователя из списка слева, чтобы просмотреть детали или переписку." 
+                                       TextWrapping="Wrap" Foreground="{StaticResource TextLightBrush}"/>
+                            <!-- Здесь можно добавить элементы для отображения деталей выбранного пользователя или его переписки -->
+                            <TextBlock Text="{Binding SelectedUser.Username, StringFormat='Выбран пользователь: {0}'}" Margin="0,10,0,0" FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding SelectedUser.Email, StringFormat='Email: {0}'}" Margin="0,5,0,0"/>
+                            <TextBlock Text="{Binding SelectedUser.IsOnline, StringFormat='Статус: {0}', Converter={StaticResource BoolToOnlineStatusConverter}}" Margin="0,5,0,0"/>
+                            <TextBlock Text="{Binding SelectedUser.LastSeen, StringFormat='Последний раз в сети: {0:dd.MM.yyyy HH:mm}'}" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>
